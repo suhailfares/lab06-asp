@@ -1,9 +1,9 @@
-name: Deploy to Staging
+name: Deploy to Production
 
 on:
   push:
     branches:
-      - staging
+      - production
 
 permissions:
   id-token: write
@@ -24,10 +24,14 @@ jobs:
         run: |
           dotnet restore
           dotnet publish -c Release -o ./out
+          ls -la ./out
 
       - name: Create Zip File
         run: |
-          zip -r app.zip ./out/*
+          cd out
+          zip -r ../app.zip .
+          cd ..
+          ls -la
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
@@ -38,7 +42,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: staging 
+    environment: main
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v3
@@ -53,7 +57,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Deploy to Azure App Service
         run: |
-            az webapp deploy \
-              --resource-group Fares-staging-rg-01 \
-              --name Fares-staging-app-01 \
-              --src-path ./publish
+          az webapp deploy \
+            --resource-group Fares-staging-rg-01 \
+            --name Fares-staging-app-01 \
+            --src-path ./publish
