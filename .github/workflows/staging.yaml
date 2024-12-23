@@ -5,9 +5,11 @@ on:
     branches:
       - staging
 
+
 permissions:
   id-token: write
   contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -55,9 +57,10 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Deploy to Azure App Service
         run: |
           az webapp deploy \
             --resource-group Fares-staging-rg-01 \
             --name Fares-staging-app-01 \
-            --src-path ./publish
+            --src-path app.zip
