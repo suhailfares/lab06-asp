@@ -27,11 +27,17 @@ jobs:
           dotnet restore
           dotnet publish -c Release -o ./output
           
+      - name: Creating the Zip File
+        run: |
+          cd output
+          zip -r ../output.zip .
+          cd ..
+          
       - name: Uploading the Artifact
         uses: actions/upload-artifact@v3
         with:
           name: dotnet-app
-          path: app.zip
+          path: output.zip
 
   deploy:
     needs: build
