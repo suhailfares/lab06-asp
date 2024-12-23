@@ -1,0 +1,66 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - production
+
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
+
+      - name: Build Application
+        run: |
+          dotnet restore
+          dotnet publish -c Release -o ./out
+          ls -la ./out
+
+      - name: Create Zip File
+        run: |
+          cd out
+          zip -r ../app.zip .
+          cd ..
+          ls -la
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dotnet-app
+          path: app.zip
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dotnet-app
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure App Service
+        run: |
+          az webapp deploy \
+            --resource-group Fares-production-rg-01 \
+            --name Fares-staging-app-01 \
+            --src-path app.zip
