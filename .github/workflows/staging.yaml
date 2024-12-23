@@ -28,18 +28,6 @@ jobs:
           dotnet publish -c Release -o ./out
           ls -la ./out
 
-      - name: Create Zip File
-        run: |
-          cd out
-          zip -r ../app.zip .
-          cd ..
-          ls -la
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: dotnet-app
-          path: app.zip
 
   deploy:
     needs: build
