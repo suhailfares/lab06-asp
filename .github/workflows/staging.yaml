@@ -4,11 +4,12 @@ on:
   push:
     branches:
       - staging
-      
+
 
 permissions:
   id-token: write
   contents: read
+  environment: staging
 
 jobs:
   build:
