@@ -62,5 +62,5 @@ jobs:
         run: |
           az webapp deploy \
             --resource-group Fares-production-rg-01 \
-            --name Fares-staging-app-01 \
+            --name Fares-production-app-01 \
             --src-path app.zip
